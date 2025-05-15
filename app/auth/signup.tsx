@@ -13,7 +13,7 @@ import Animated, {
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, User } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { auth } from '@/lib/firebase'; // Ensure this path is correct
+import { auth } from '@/lib/firebase';
 export default function SignupScreen() {
   const router = useRouter();
   const [name, setName] = React.useState('');
