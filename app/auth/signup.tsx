@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
   withDelay,
-  Easing 
+  Easing
 } from 'react-native-reanimated';
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, User } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import { auth } from '@/lib/firebase'; // Ensure this path is correct
 export default function SignupScreen() {
   const router = useRouter();
   const [name, setName] = React.useState('');
@@ -20,76 +22,82 @@ export default function SignupScreen() {
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-  
+
   // Animation values
   const headerOpacity = useSharedValue(0);
   const headerTranslateY = useSharedValue(-20);
   const formOpacity = useSharedValue(0);
   const formTranslateY = useSharedValue(30);
-  
+
   useEffect(() => {
     headerOpacity.value = withTiming(1, { duration: 800 });
     headerTranslateY.value = withTiming(0, { duration: 800, easing: Easing.out(Easing.cubic) });
-    
+
     formOpacity.value = withDelay(300, withTiming(1, { duration: 800 }));
     formTranslateY.value = withDelay(300, withTiming(0, { duration: 800, easing: Easing.out(Easing.cubic) }));
   }, []);
-  
+
   const headerAnimatedStyle = useAnimatedStyle(() => ({
     opacity: headerOpacity.value,
     transform: [{ translateY: headerTranslateY.value }]
   }));
-  
+
   const formAnimatedStyle = useAnimatedStyle(() => ({
     opacity: formOpacity.value,
     transform: [{ translateY: formTranslateY.value }]
   }));
-  
-  const handleSignup = () => {
+
+  const handleSignup = async () => {
     if (name.trim() === '' || email.trim() === '' || password.trim() === '' || confirmPassword.trim() === '') {
       return;
     }
-    
+
     if (password !== confirmPassword) {
       return;
     }
-    
-    router.replace('/(tabs)');
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('User signed up:', user);
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      console.error('Signup error:', error.message);
+    }
   };
 
   const handleBackToLanding = () => {
     router.back();
   };
-  
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <StatusBar style="dark" />
-      <Image 
-        source={{ uri: 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg' }} 
-        style={styles.backgroundImage} 
+      <Image
+        source={{ uri: 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg' }}
+        style={styles.backgroundImage}
       />
       <LinearGradient
         colors={['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.98)']}
         style={styles.gradient}
       />
-      
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <TouchableOpacity 
-          style={styles.backButton} 
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={handleBackToLanding}
         >
           <ArrowLeft size={24} color="#333" />
         </TouchableOpacity>
-        
+
         <Animated.View style={[styles.headerContainer, headerAnimatedStyle]}>
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Join Journey Genie and start planning your dream trips</Text>
         </Animated.View>
-        
+
         <Animated.View style={[styles.formContainer, formAnimatedStyle]}>
           <View style={styles.inputContainer}>
             <User size={20} color="#888" style={styles.inputIcon} />
@@ -102,7 +110,7 @@ export default function SignupScreen() {
               autoCapitalize="words"
             />
           </View>
-          
+
           <View style={styles.inputContainer}>
             <Mail size={20} color="#888" style={styles.inputIcon} />
             <TextInput
@@ -115,7 +123,7 @@ export default function SignupScreen() {
               autoCapitalize="none"
             />
           </View>
-          
+
           <View style={styles.inputContainer}>
             <Lock size={20} color="#888" style={styles.inputIcon} />
             <TextInput
@@ -126,7 +134,7 @@ export default function SignupScreen() {
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
             />
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setShowPassword(!showPassword)}
               style={styles.eyeIcon}
             >
@@ -137,7 +145,7 @@ export default function SignupScreen() {
               )}
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.inputContainer}>
             <Lock size={20} color="#888" style={styles.inputIcon} />
             <TextInput
@@ -148,7 +156,7 @@ export default function SignupScreen() {
               onChangeText={setConfirmPassword}
               secureTextEntry={!showConfirmPassword}
             />
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => setShowConfirmPassword(!showConfirmPassword)}
               style={styles.eyeIcon}
             >
@@ -159,14 +167,14 @@ export default function SignupScreen() {
               )}
             </TouchableOpacity>
           </View>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.signupButton}
             onPress={handleSignup}
           >
             <Text style={styles.signupButtonText}>Sign Up</Text>
           </TouchableOpacity>
-          
+
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Already have an account?</Text>
             <TouchableOpacity onPress={() => router.push('/auth/login')}>
