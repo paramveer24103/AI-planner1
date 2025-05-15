@@ -1,23 +1,25 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, initializeAuth } from 'firebase/auth';
-import { getReactNativePersistence } from 'firebase/auth/react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDGaKh2pBGoNtBRUpdTCHXKC02UQ4lfCJQ",
-  authDomain: "myapplication-26ed9f1d.firebaseapp.com",
-  projectId: "myapplication-26ed9f1d",
-  storageBucket: "myapplication-26ed9f1d.firebasestorage.app",
-  messagingSenderId: "103806848300",
-  appId: "1:103806848300:web:3c06a85ba48c42b74ab089"
+  apiKey: "AIzaSyDPjltEv_JKZ2a1Wohg_RfxX8VfSciQ2kY",
+  authDomain: "ai-trip-planner-50b93.firebaseapp.com",
+  databaseURL: "https://ai-trip-planner-50b93-default-rtdb.firebaseio.com",
+  projectId: "ai-trip-planner-50b93",
+  storageBucket: "ai-trip-planner-50b93.firebasestorage.app",
+  messagingSenderId: "1009343698985",
+  appId: "1:1009343698985:web:6dd443e231d9b012982438",
+  measurementId: "G-Y7D1G0XKEH"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
 
-// Initialize Auth with AsyncStorage persistence
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage)
-});
-
-export { auth };
+// Note: Analytics is not directly supported in React Native
+// If you need analytics, consider using a React Native specific package
